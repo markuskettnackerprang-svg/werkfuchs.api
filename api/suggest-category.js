@@ -4,7 +4,10 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { imageBase64 } = req.body;
+    const body =
+      typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+
+    const { imageBase64 } = body || {};
 
     if (!imageBase64) {
       return res.status(400).json({ error: "No image provided" });
@@ -14,7 +17,7 @@ module.exports = async function handler(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
@@ -60,16 +63,8 @@ Antworte IMMER als JSON:
 
     let parsed;
 
- let parsed;
-
-try {
-  parsed = JSON.parse(content);
-} catch {
-  const match = content.match(/\{[\s\S]*\}/);
-
-  if (match) {
     try {
-      parsed = JSON.parse(match[0]);
+      parsed = JSON.parse(content);
     } catch {
       parsed = {
         category: "",
@@ -77,22 +72,14 @@ try {
         reason: content,
       };
     }
-  } else {
-    parsed = {
-      category: "",
-      confidence: "",
-      reason: content,
-    };
-  }
-}
 
     return res.status(200).json(parsed);
-
   } catch (error) {
     console.log("API ERROR:", error);
+
     return res.status(500).json({
       error: "Server error",
       details: error.message,
     });
   }
-}
+};
