@@ -61,10 +61,17 @@ Antworte IMMER als JSON:
 
     const content = data.choices?.[0]?.message?.content || "{}";
 
-    let parsed;
+ let parsed;
 
+try {
+  parsed = JSON.parse(content);
+} catch {
+  // 🔥 Versuche JSON aus Markdown rauszuholen
+  const match = content.match(/\{[\s\S]*\}/);
+
+  if (match) {
     try {
-      parsed = JSON.parse(content);
+      parsed = JSON.parse(match[0]);
     } catch {
       parsed = {
         category: "",
@@ -72,6 +79,14 @@ Antworte IMMER als JSON:
         reason: content,
       };
     }
+  } else {
+    parsed = {
+      category: "",
+      confidence: "",
+      reason: content,
+    };
+  }
+}
 
     return res.status(200).json(parsed);
   } catch (error) {
