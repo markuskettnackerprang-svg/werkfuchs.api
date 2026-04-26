@@ -40,7 +40,7 @@ ${comment || "-"}
         Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "feedback@werkfuchs.app>",
+        from: "feedback@werkfuchs.app",
         to: "Markus.Kettnacker-Prang@web.de",
         subject: `WerkFuchs Feedback (${rating || "-"}/5)`,
         text: emailText,
